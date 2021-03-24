@@ -1,0 +1,424 @@
+<html>
+
+<head>
+    <title>J-Stars</title>
+    <link rel="shortcut icon" href="logo.png">
+
+    <style>
+        body {
+            background: url(galaxy.jpg);
+            background-size: 100%;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
+        }
+
+        #postman {
+            width: 20px;
+            height: 20px;
+            background-color: #333;
+            background: url(open.png) no-repeat center center;
+            background-size: 170%;
+            position: absolute;
+            border: 1px;
+            border-radius: 50%;
+            left: 0px;
+            top: 0px;
+            transition: 0.3s;
+
+        }
+
+
+        .dados {
+            width: 300px;
+            height: 150px;
+            border: 1px solid blue;
+            text-align: center;
+
+        }
+
+        #ac-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, .6);
+            z-index: 1001;
+        }
+
+        #popup {
+            width: 555px;
+            height: 375px;
+            background: #FFFFFF;
+            border: 5px solid #000;
+            border-radius: 25px;
+            -moz-border-radius: 25px;
+            -webkit-border-radius: 25px;
+            box-shadow: #64686e 0px 0px 3px 3px;
+            -moz-box-shadow: #64686e 0px 0px 3px 3px;
+            -webkit-box-shadow: #64686e 0px 0px 3px 3px;
+            position: relative;
+            top: 150px;
+            left: 375px;
+        }
+    </style>
+
+    <script>
+
+        document.addEventListener("keydown", Mover, false);
+        var y = 0;
+        var x = 0;
+        var coletados = 0;
+        var altura = [];
+        var largura = [];
+        var i = 0;
+        var con = false;
+        var dead = true;
+        var ghostId = 0;
+        var arrayGhost = [];
+
+
+        function musicPlay() {
+            document.getElementById('player').play();
+            var audio = document.getElementById("player");
+            audio.volume = 0.1;
+              
+            
+        }
+
+        function collectStar(){
+            document.getElementById('collect').play();
+            var audio = document.getElementById("collect");
+            audio.volume = 0.7;
+        }
+
+        function youDie(){
+            document.getElementById('gameOver').play();
+            var audio = document.getElementById("gameOver");
+            audio.volume = 0.5;
+        }
+
+
+        function createBox() {
+            for (i = 0; i < 20; i++) {
+                var divNova = document.createElement("div");
+                divNova.style.width = "20px";
+                divNova.style.height = "20px";
+                divNova.style.left = Math.floor(Math.random() * (100 - 1) / 5) * 5 + "%";
+                divNova.style.top = Math.floor(Math.random() * (100 - 1) / 5) * 5 + "%";
+                divNova.style.background = "url(star.png) no-repeat center center";
+                divNova.style.position = "absolute";
+                divNova.setAttribute("Id", i);
+                document.body.appendChild(divNova, inicio);
+                altura.push(divNova.style.left);
+                largura.push(divNova.style.top);
+            }
+            ghostAdd();
+        }
+
+        function novaCaixa() {
+            var divNova = document.createElement("div");
+            divNova.style.width = "20px";
+            divNova.style.height = "20px";
+
+            divNova.style.left = Math.floor(Math.random() * (100 - 1) / 5) * 5 + "%";
+            divNova.style.top = Math.floor(Math.random() * (100 - 1) / 5) * 5 + "%";
+            divNova.style.background = "url(star.png) no-repeat center center";
+            divNova.style.position = "absolute";
+            divNova.setAttribute("Id", i);
+            document.body.appendChild(divNova, inicio);
+            altura.push(divNova.style.left);
+            largura.push(divNova.style.top);
+            i++;
+
+        }
+        function coletar(y, x) {
+            x = x + '%';
+            y = y + '%';
+            var count = 0;
+
+            while (count < largura.length) {
+                if (y == altura[count] && x == largura[count]) {
+                    if (document.getElementById(count).style.display != "none") {
+                        coletados += 1;
+                        if (coletados % 5 == 0) {
+                            ghostAdd();
+                        }
+                        document.getElementById(count).style.display = "none";
+                        novaCaixa();
+                        document.getElementById("simbolo").innerText = coletados;
+                        collectStar();
+
+                    }
+                }
+                count++;
+            }
+
+
+        }
+
+        function Mover(e) {
+
+            var keyCode = e.keyCode;
+            setTimeout(function () {
+
+
+                switch (keyCode) {
+                    case 68:
+
+                        if (x < 95) {
+                            x += 5;
+                            if (con == false) {
+                                document.getElementById("postman").style.background = "url(closed.png) no-repeat center center";
+                                document.getElementById("postman").style.backgroundSize = "170%";
+                                con = true;
+                            } else {
+                                document.getElementById("postman").style.background = "url(open.png) no-repeat center center";
+                                document.getElementById("postman").style.backgroundSize = "170%";
+                                con = false;
+                            }
+                            document.getElementById("postman").style.left = x + "%";
+                            coletar(x, y);
+
+                        }
+
+                        break;
+
+                    case 83:
+
+                        if (y < 95) {
+                            y += 5;
+                            if (con == false) {
+                                document.getElementById("postman").style.background = "url(closedown.png) no-repeat center center";
+                                document.getElementById("postman").style.backgroundSize = "170%";
+                                con = true;
+                            } else {
+                                document.getElementById("postman").style.background = "url(down.png) no-repeat center center";
+                                document.getElementById("postman").style.backgroundSize = "170%";
+                                con = false;
+                            }
+                            document.getElementById("postman").style.top = y + "%";
+                            coletar(x, y);
+
+                        }
+
+                        break;
+
+                    case 65:
+                        if (x > 0) {
+                            x -= 5;
+                            if (con == false) {
+                                document.getElementById("postman").style.background = "url(closedleft.png) no-repeat center center";
+                                document.getElementById("postman").style.backgroundSize = "170%";
+                                con = true;
+                            } else {
+                                document.getElementById("postman").style.background = "url(openleft.png) no-repeat center center";
+                                document.getElementById("postman").style.backgroundSize = "170%";
+                                con = false;
+                            }
+                            document.getElementById("postman").style.left = x + "%";
+                            coletar(x, y);
+
+                        }
+
+                        break;
+
+                    case 87:
+                        if (y > 1) {
+                            y -= 5;
+                            if (con == false) {
+                                document.getElementById("postman").style.background = "url(closeup.png) no-repeat center center";
+                                document.getElementById("postman").style.backgroundSize = "170%";
+                                con = true;
+                            } else {
+                                document.getElementById("postman").style.background = "url(up.png) no-repeat center center";
+                                document.getElementById("postman").style.backgroundSize = "170%";
+                                con = false;
+                            }
+                            document.getElementById("postman").style.top = y + "%";
+                            coletar(x, y);
+
+                        }
+                        break;
+
+                }
+
+            }, 150);
+            gameOver(arrayGhost[count2].left, arrayGhost[count2].top);
+
+
+        }
+
+
+        function ghostMove() {
+            var count2 = 0;
+
+            for (count2 = 0; count2 < ghostId; count2++) {
+
+                var fant = document.getElementById("ghost" + count2);
+
+                var t = Math.floor(Math.random() * 4);;
+
+                if (t == 0) {
+
+                    if (arrayGhost[count2].top < 95) {
+                        arrayGhost[count2].top = arrayGhost[count2].top + 5;
+                        fant.style.top = arrayGhost[count2].top + "%";
+
+
+                    }
+
+                } else if (t == 1) {
+                    if (arrayGhost[count2].top > 0) {
+                        arrayGhost[count2].top = arrayGhost[count2].top - 5;
+                        fant.style.top = arrayGhost[count2].top + "%";
+
+
+                    }
+
+
+                } else if (t == 2) {
+
+                    if (arrayGhost[count2].left > 0) {
+                        arrayGhost[count2].left = arrayGhost[count2].left - 5;
+                        fant.style.left = arrayGhost[count2].left + "%";
+
+
+
+                    }
+
+
+                } else {
+                    if (arrayGhost[count2].left < 95) {
+                        arrayGhost[count2].left = arrayGhost[count2].left + 5;
+                        fant.style.left = arrayGhost[count2].left + "%";
+
+
+                    }
+
+                }
+
+                gameOver(arrayGhost[count2].left, arrayGhost[count2].top);
+            }
+            awaysOn();
+
+        }
+
+
+        function ghostAdd() {
+            var newGhost = document.createElement("div");
+            arrayGhost[ghostId] = new ghost(20, 20, 1, 170, 50, 0.5, (Math.floor(Math.random() * (100 - 1) / 5) * 5),
+                (Math.floor(Math.random() * (100 - 1) / 5) * 5), "url(ghost.png) no-repeat center center", "absolute", ("ghost" + ghostId));
+            newGhost.style.width = arrayGhost[ghostId].width + "px";
+            newGhost.style.height = arrayGhost[ghostId].height + "px";
+            newGhost.style.border = arrayGhost[ghostId].border + "px";
+            newGhost.style.backgroundSize = arrayGhost[ghostId].backgoundsize + "px";
+            newGhost.style.borderRadius = arrayGhost[ghostId].borderRadius + "%";
+            newGhost.style.transition = arrayGhost[ghostId].transition + "s";
+            newGhost.style.left = arrayGhost[ghostId].left + "%";
+            newGhost.style.top = arrayGhost[ghostId].top + "%";
+            newGhost.style.background = arrayGhost[ghostId].background;
+            newGhost.style.position = arrayGhost[ghostId].position;
+            newGhost.setAttribute("Id", arrayGhost[ghostId].attribute);
+            ghostId++;
+            document.body.appendChild(newGhost, inicio);
+
+        }
+
+        function ghost(widt, heig, bord, backsize, bordrad, trans, lef, top, bak, pos, atrib) {
+            this.width = widt;
+            this.height = heig;
+            this.border = bord;
+            this.backgoundsize = backsize;
+            this.borderRadius = bordrad;
+            this.transition = trans;
+            this.left = lef;
+            this.top = top;
+            this.background = bak;
+            this.position = pos;
+            this.attribute = atrib;
+        }
+
+
+        function awaysOn() {
+            setTimeout(function () {
+                ghostMove();
+            }, 1000 - coletados * 10);
+            document.getElementById("start").disabled = true;
+
+        }
+        function gameOver(o, p) {
+            if (x == o && y == p) {
+                youDie();
+                setTimeout(function () {
+                    alert("Game Over");
+                    if (confirm("Reinicia?")) {
+                        location.reload();
+                    } else {
+                        var node = document.createElement("LI");
+                        var textnode = document.createTextNode("GameOver");
+                        node.style.color = "red";
+                        node.appendChild(textnode);
+
+                        document.getElementById("pontuacao").appendChild(node);
+
+                        return false;
+                    }
+                    return true;
+                }, 500);
+            }
+            return false;
+        }
+        function PopUp() {
+            document.getElementById('ac-wrapper').style.display = "none";
+        }
+
+    </script>
+
+</head>
+
+<body id="inicio">
+        <audio id="player" loop>
+            <source src="base.mp3" type="audio/mp3">
+        </audio>
+        <audio id="collect">
+            <source src="collect.mp3" type="audio/mp3">
+        </audio>
+        <audio id="gameOver">
+            <source src="Over.mp3" type="audio/mp3">
+        </audio>
+    <div id="postman"></div>
+    <div align="center">
+        <button onclick="awaysOn(); createBox();" id="start">Start</button>
+        <div class="dados" id="pontuacao">
+            <h1 id="codigoTecla" style="color: white;">Pontos</h1>
+            <h2 id="simbolo" style="color: white;">0</h2>
+        </div>
+    </div>
+
+    <div id="ac-wrapper">
+        <div id="popu">
+            <center>
+                <h2>Como Jogar: </h2>
+                <ul align="left">
+                    <li>J-Stars Regras:</li>
+                    <li>O objetivo é coletar o máximo de estrelas possíveis.</li>
+                    <li>Não possui limites de estrelas para coletar.</li>
+                    <li>A cada 5 estrelas coletadas mais fantasmas apareceram para tentar te impedir.</li>
+                    <li>Se o fantasma encostar em seu personagem será gameOver.</li>
+                    </br>
+
+                    <li>Faça uso dos direcionais WASD para mover.</li>
+                    <li>É importante lembrar que a velocidade aumentara gradativamente</li>
+                    <li>Livre-se deles é tente coletar o maior número de estrelas.</li>
+                    <li>Isso é tudo, bom jogo e divirta-se.</li>
+                    <li>XD</li>
+                </ul>
+                <input type="submit" name="submit" value="Começar!" onClick="PopUp(); awaysOn(); createBox(); musicPlay();" />
+            </center>
+        </div>
+    </div>
+</body>
+
+</html>
